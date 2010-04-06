@@ -31,6 +31,7 @@ class Plot(gobject.GObject):
     def __init__(self):
 
         self.window = gtk.Window()
+        self.window.set_title("Cairo Plot")
 
         self.drawing_area = gtk.DrawingArea()
         self.drawing_area.set_events(gtk.gdk.ALL_EVENTS_MASK)
@@ -57,7 +58,7 @@ class Plot(gobject.GObject):
     def button_press_cb(self, source, event):
 
         self.moving = True
-        gobject.timeout_add(50, self.move, *self.display.get_pointer()[1:-1])
+        gobject.timeout_add(30, self.move, *self.display.get_pointer()[1:-1])
 
 
     def button_release_cb(self, source, event):
@@ -77,7 +78,7 @@ class Plot(gobject.GObject):
             self.offset_y += new_y - old_y
             self.draw()
 
-        gobject.timeout_add(50, self.move, new_x, new_y)
+        gobject.timeout_add(30, self.move, new_x, new_y)
 
 
     def expose_cb(self, source, event):

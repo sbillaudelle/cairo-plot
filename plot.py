@@ -140,26 +140,32 @@ class Plot(gobject.GObject):
         while dist < DISTANCE_MIN:
             dist *= 2
             step *= 2
+            
+        rounded_zoom_level_x = 2 ** math.ceil(math.log(self.zoom_level_x, 2))
+        decimal_places = math.log(rounded_zoom_level_x/2, 2)
+        if decimal_places < 0:
+            decimal_places = 0
+        elif decimal_places > 5:
+            decimal_places = 5
 
         position = (bound_left // dist) * dist
         while position <= (bound_right // dist) * dist:
             ctx.move_to(position, -5)
             ctx.line_to(position, 5)
             ctx.stroke()
+            
+            mark = round(position / dist * step, decimal_places)
+            if decimal_places == 0:
+				mark = int(mark)
 
-            mark = str(round(position / dist * step, 2))
             ctx.move_to(position, 10)
 
             pango_ctx = pangocairo.CairoContext(ctx)
             layout = pango_ctx.create_layout()
-            layout.set_text(mark)
+            layout.set_text(str(mark))
             pango_ctx.show_layout(layout)
 
             position += dist
-
-        zf = 2 ** round(math.log(self.zoom_level_x, 2), 0)
-        nkst = math.log(zf/2, 2)
-        print nkst, self.zoom_level_x
 
 
     def draw_func(self, ctx, width, height):

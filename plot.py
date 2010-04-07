@@ -21,12 +21,14 @@ import math
 import gobject
 import gtk
 import cairo
-import pango
-import pangocairo
 
 MOVE_TIMEOUT = 20
 DISTANCE_MIN = 40
 DISTANCE_MAX = 80
+
+COLORS = {
+    'axes': (.5, .5, .5, 1),
+    }
 
 class Plot(gobject.GObject):
 
@@ -116,6 +118,9 @@ class Plot(gobject.GObject):
 
     def draw_axes(self, ctx, width, height):
 
+        ctx.save()
+        ctx.set_source_rgba(*COLORS['axes'])
+
         bound_left = - self.offset_x
         bound_right = width - self.offset_x
         bound_top = - self.offset_y
@@ -160,13 +165,14 @@ class Plot(gobject.GObject):
 
             ctx.move_to(position, 10)
 
-            pango_ctx = pangocairo.CairoContext(ctx)
-            layout = pango_ctx.create_layout()
-            layout.set_text(str(mark))
-            pango_ctx.show_layout(layout)
-
+            ctx.select_font_face("Monospace", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+            ctx.set_font_size(12)
+            x_bearing, y_bearing, width, height = ctx.text_extents(str(mark))[:4]
+            ctx.move_to(position + 0.5 - width / 2 - x_bearing, 15)
+            ctx.show_text(str(mark))
             position += dist
 
+        ctx.restore()
 
     def draw_func(self, ctx, width, height):
 
